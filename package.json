@@ -1,0 +1,21 @@
+{
+  "name": "epc-guardian",
+  "private": true,
+  "scripts": {
+    "bootstrap": "pip install -e \".[dev]\" && npm ci --prefix apps/web",
+    "infra-up": "docker compose -f infra/docker-compose.yml up -d",
+    "infra-down": "docker compose -f infra/docker-compose.yml down",
+    "migrate": "alembic upgrade head",
+    "seed-demo": "python scripts/seed_demo.py",
+    "reset-demo": "python scripts/reset_demo.py",
+    "dev:api": "uvicorn apps.api.epc_api.main:app --reload --port 8000",
+    "dev:web": "npm run dev --prefix apps/web",
+    "test": "pytest tests/ -q",
+    "test:cov": "pytest tests/ --cov=packages --cov=apps",
+    "test:web": "npm test --prefix apps/web",
+    "lint": "ruff check packages/ apps/",
+    "typecheck": "mypy packages/ apps/",
+    "benchmark": "python scripts/run_benchmark.py",
+    "smoke": "python scripts/smoke_test.py"
+  }
+}
