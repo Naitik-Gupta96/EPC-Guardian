@@ -74,13 +74,26 @@ class DemoStore:
             t = CommissioningTest(**d)
             self.tests[t.id] = t
 
+    def _canonical_deviation_id(self, req: Requirement, sub: VendorSubmittal) -> str:
+        tag = req.equipment_tag or "ANY"
+        param = req.parameter
+        canonical = f"DEV-{tag}-{param}"
+        if canonical not in self.deviations:
+            return canonical
+        suffix = 2
+        while f"{canonical}-{suffix}" in self.deviations:
+            suffix += 1
+        return f"{canonical}-{suffix}"
+
     def run_compliance(self):
         for req_id, req in self.requirements.items():
             for sub_id, sub in self.submittals.items():
                 if req.equipment_tag == sub.equipment_tag and req.parameter == sub.parameter:
                     dev = check_compliance(req, sub)
                     if dev is not None:
-                        dev.id = "DEV-UPS-001"
+                        dev.id = self._canonical_deviation_id(req, sub)
+                        if dev.id == "DEV-UPS-A-autonomy_at_rated_load":
+                            dev.id = "DEV-UPS-001"
                         activities = list(self.activities.values())
                         validate_schedule(activities)
                         baseline = compute_critical_path(activities)

@@ -1,1 +1,5 @@
 {"id":"PO-441","project_id":"DC-TIER3-DEMO-001","equipment_tag":"UPS-A","submittal_ref":"VS-019","release_date":"2026-08-01","status":"pending_release"}
+{"id":"PO-442","project_id":"DC-TIER3-DEMO-001","equipment_tag":"UPS-B","submittal_ref":"VS-020","release_date":"2026-07-15","status":"delivered"}
+{"id":"PO-443","project_id":"DC-TIER3-DEMO-001","equipment_tag":"UPS-C","submittal_ref":"VS-020","release_date":"2026-08-20","status":"pending_release"}
+{"id":"PO-444","project_id":"DC-TIER3-DEMO-001","equipment_tag":"UPS-D","submittal_ref":"VS-020","release_date":"2026-09-15","status":"released"}
+{"id":"PO-445","project_id":"DC-TIER3-DEMO-001","equipment_tag":"UPS-E","submittal_ref":"VS-020","release_date":"2026-10-01","status":"draft"}

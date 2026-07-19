@@ -4,9 +4,17 @@
 {"id":"A-2110","project_id":"DC-TIER3-DEMO-001","description":"Electrical Rough-In","predecessors":["A-2100"],"duration_days":20,"total_float_days":null,"linked_equipment_tags":[]}
 {"id":"A-2120","project_id":"DC-TIER3-DEMO-001","description":"Cooling Infrastructure","predecessors":["A-2100"],"duration_days":25,"total_float_days":null,"linked_equipment_tags":[]}
 {"id":"A-2190","project_id":"DC-TIER3-DEMO-001","description":"UPS-A Factory Acceptance Test","predecessors":["A-2110"],"duration_days":5,"total_float_days":null,"linked_equipment_tags":["UPS-A"]}
+{"id":"A-2195","project_id":"DC-TIER3-DEMO-001","description":"UPS-B Factory Acceptance Test","predecessors":["A-2110"],"duration_days":5,"total_float_days":null,"linked_equipment_tags":["UPS-B"]}
+{"id":"A-2196","project_id":"DC-TIER3-DEMO-001","description":"UPS-C Factory Acceptance Test","predecessors":["A-2110"],"duration_days":5,"total_float_days":null,"linked_equipment_tags":["UPS-C"]}
 {"id":"A-2200","project_id":"DC-TIER3-DEMO-001","description":"UPS-A Shipping & Delivery","predecessors":["A-2190"],"duration_days":10,"total_float_days":null,"linked_equipment_tags":["UPS-A"]}
+{"id":"A-2205","project_id":"DC-TIER3-DEMO-001","description":"UPS-B Shipping & Delivery","predecessors":["A-2195"],"duration_days":10,"total_float_days":null,"linked_equipment_tags":["UPS-B"]}
+{"id":"A-2206","project_id":"DC-TIER3-DEMO-001","description":"UPS-C Shipping & Delivery","predecessors":["A-2196"],"duration_days":10,"total_float_days":null,"linked_equipment_tags":["UPS-C"]}
 {"id":"A-2210","project_id":"DC-TIER3-DEMO-001","description":"UPS-A Installation","predecessors":["A-2200"],"duration_days":14,"total_float_days":null,"linked_equipment_tags":["UPS-A"]}
+{"id":"A-2215","project_id":"DC-TIER3-DEMO-001","description":"UPS-B Installation","predecessors":["A-2205"],"duration_days":10,"total_float_days":null,"linked_equipment_tags":["UPS-B"]}
+{"id":"A-2216","project_id":"DC-TIER3-DEMO-001","description":"UPS-C Installation","predecessors":["A-2206"],"duration_days":10,"total_float_days":null,"linked_equipment_tags":["UPS-C"]}
 {"id":"A-2220","project_id":"DC-TIER3-DEMO-001","description":"UPS-A Commissioning","predecessors":["A-2210"],"duration_days":7,"total_float_days":null,"linked_equipment_tags":["UPS-A"]}
-{"id":"A-2300","project_id":"DC-TIER3-DEMO-001","description":"General Fit-Out","predecessors":["A-2120","A-2220"],"duration_days":30,"total_float_days":null,"linked_equipment_tags":[]}
-{"id":"A-2400","project_id":"DC-TIER3-DEMO-001","description":"Integrated Systems Test","predecessors":["A-2300"],"duration_days":10,"total_float_days":null,"linked_equipment_tags":["UPS-A"]}
+{"id":"A-2225","project_id":"DC-TIER3-DEMO-001","description":"UPS-B Commissioning","predecessors":["A-2215"],"duration_days":5,"total_float_days":null,"linked_equipment_tags":["UPS-B"]}
+{"id":"A-2226","project_id":"DC-TIER3-DEMO-001","description":"UPS-C Commissioning","predecessors":["A-2216"],"duration_days":5,"total_float_days":null,"linked_equipment_tags":["UPS-C"]}
+{"id":"A-2300","project_id":"DC-TIER3-DEMO-001","description":"General Fit-Out","predecessors":["A-2120","A-2220","A-2225","A-2226"],"duration_days":30,"total_float_days":null,"linked_equipment_tags":[]}
+{"id":"A-2400","project_id":"DC-TIER3-DEMO-001","description":"Integrated Systems Test","predecessors":["A-2300"],"duration_days":10,"total_float_days":null,"linked_equipment_tags":[]}
 {"id":"A-2500","project_id":"DC-TIER3-DEMO-001","description":"Handover","predecessors":["A-2400"],"duration_days":5,"total_float_days":null,"linked_equipment_tags":[]}
