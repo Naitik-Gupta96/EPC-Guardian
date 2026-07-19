@@ -6,11 +6,16 @@ from packages.shared.config import settings
 from packages.shared.logging import setup_logging
 from apps.api.epc_api.errors import AppError, app_error_handler
 from apps.api.epc_api.routes.health import router as health_router
+from apps.api.epc_api.routes.projects import router as projects_router
+from apps.api.epc_api.routes.deviations import router as deviations_router
+from apps.api.epc_api.routes.workflows import router as workflows_router
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     setup_logging(settings.LOG_LEVEL)
+    from apps.api.epc_api.store import get_store
+    get_store()
     yield
 
 
@@ -31,3 +36,6 @@ app.add_middleware(
 app.add_exception_handler(AppError, app_error_handler)
 
 app.include_router(health_router)
+app.include_router(projects_router)
+app.include_router(deviations_router)
+app.include_router(workflows_router)

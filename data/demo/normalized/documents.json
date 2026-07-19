@@ -1,0 +1,51 @@
+[
+  {
+    "id": "DOC-SPEC-001",
+    "project_id": "DC-TIER3-DEMO-001",
+    "type": "specification",
+    "filename": "01_client_specification.pdf",
+    "status": "parsed"
+  },
+  {
+    "id": "DOC-VS-019",
+    "project_id": "DC-TIER3-DEMO-001",
+    "type": "submittal",
+    "filename": "02_vendor_submittal_vs019.pdf",
+    "status": "parsed"
+  },
+  {
+    "id": "DOC-VS-020",
+    "project_id": "DC-TIER3-DEMO-001",
+    "type": "submittal",
+    "filename": "03_vendor_submittal_vs020.pdf",
+    "status": "parsed"
+  },
+  {
+    "id": "DOC-PROC-001",
+    "project_id": "DC-TIER3-DEMO-001",
+    "type": "procurement_tracker",
+    "filename": "04_procurement_tracker.xlsx",
+    "status": "parsed"
+  },
+  {
+    "id": "DOC-SCHED-001",
+    "project_id": "DC-TIER3-DEMO-001",
+    "type": "schedule",
+    "filename": "05_project_schedule.csv",
+    "status": "parsed"
+  },
+  {
+    "id": "DOC-EQUIP-001",
+    "project_id": "DC-TIER3-DEMO-001",
+    "type": "equipment_register",
+    "filename": "06_equipment_register.xlsx",
+    "status": "parsed"
+  },
+  {
+    "id": "DOC-CHECK-001",
+    "project_id": "DC-TIER3-DEMO-001",
+    "type": "commissioning_checklist",
+    "filename": "07_commissioning_checklist.xlsx",
+    "status": "parsed"
+  }
+]

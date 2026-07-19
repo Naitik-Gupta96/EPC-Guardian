@@ -1,0 +1,9 @@
+{"source":"REQ-UPS-001","target":"UPS-A","type":"SPECIFIES"}
+{"source":"SUB-VS-019-AUTONOMY","target":"UPS-A","type":"SUBMITTED_FOR"}
+{"source":"DEV-UPS-001","target":"REQ-UPS-001","type":"VIOLATES"}
+{"source":"DEV-UPS-001","target":"SUB-VS-019-AUTONOMY","type":"FOUND_IN"}
+{"source":"UPS-A","target":"PO-441","type":"PROCURED_VIA"}
+{"source":"PO-441","target":"MS-UPS-A-DELIVERY","type":"DELIVERS_TO"}
+{"source":"MS-UPS-A-DELIVERY","target":"A-2190","type":"GATES"}
+{"source":"A-2190","target":"A-2210","type":"PRECEDES"}
+{"source":"A-2210","target":"TEST-IST-UPS-A","type":"VALIDATED_BY"}
