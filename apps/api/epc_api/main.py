@@ -9,6 +9,9 @@ from apps.api.epc_api.routes.health import router as health_router
 from apps.api.epc_api.routes.projects import router as projects_router
 from apps.api.epc_api.routes.deviations import router as deviations_router
 from apps.api.epc_api.routes.workflows import router as workflows_router
+from apps.api.epc_api.routes.documents import router as documents_router
+from apps.api.epc_api.routes.audit import router as audit_router
+from apps.api.epc_api.routes.benchmark import router as benchmark_router
 
 
 @asynccontextmanager
@@ -39,3 +42,6 @@ app.include_router(health_router)
 app.include_router(projects_router)
 app.include_router(deviations_router)
 app.include_router(workflows_router)
+app.include_router(documents_router)
+app.include_router(audit_router)
+app.include_router(benchmark_router)
