@@ -1,58 +1,78 @@
-import { useQuery } from '@tanstack/react-query'
-import { api } from '../../api/client'
+import { useEffect } from 'react'
 import { useStore } from '../../state/store'
+import { KpiCard } from '../../components/ui/KpiCard'
+import { Card, CardHeader, CardTitle } from '../../components/ui/Card'
+import { DataTable, type Column } from '../../components/ui/DataTable'
+import { Badge } from '../../components/ui/Badge'
+import { Button } from '../../components/ui/Button'
+import { Skeleton } from '../../components/ui/Skeleton'
 
 export function BenchmarkDashboard() {
-  const projectId = useStore((s) => s.projectId)
+  const { benchmarkResult, benchmarkLoading, runBenchmark } = useStore()
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['benchmark', projectId],
-    queryFn: () => api.getBenchmark(projectId),
-  })
+  useEffect(() => { runBenchmark() }, [])
 
-  if (isLoading) return <div className="font-mono text-paper/50">Loading benchmark...</div>
-  if (!data) return <div className="font-mono text-paper/50">No benchmark data</div>
+  if (benchmarkLoading) return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-5 gap-4">
+        {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-28 rounded-lg" />)}
+      </div>
+    </div>
+  )
 
-  const metrics = [
-    { label: 'Precision', value: data.precision, color: 'text-teal' },
-    { label: 'Recall', value: data.recall, color: 'text-amber' },
-    { label: 'F1 Score', value: data.f1, color: 'text-amber' },
-    { label: 'Citation Accuracy', value: data.citation_accuracy, color: 'text-teal' },
-    { label: 'Extraction Accuracy', value: data.exact_extraction, color: 'text-teal' },
+  const columns: Column<any>[] = [
+    { key: 'case', label: '#', sortable: true, render: (r) => <span className="text-xs text-text-muted">{r.case_id || r.id}</span> },
+    { key: 'category', label: 'Category', render: (r) => <Badge variant="info">{r.category || '—'}</Badge> },
+    { key: 'expected', label: 'Expected', render: (r) => <span className="text-xs font-mono">{r.expected || '—'}</span> },
+    { key: 'predicted', label: 'Predicted', render: (r) => <span className="text-xs font-mono">{r.predicted || '—'}</span> },
+    { key: 'result', label: 'Result', sortable: true, render: (r) => {
+      const correct = r.match || r.correct
+      return correct
+        ? <Badge variant="success" dot>TP</Badge>
+        : <Badge variant="error" dot>FN</Badge>
+    }},
   ]
 
   return (
-    <div>
-      <h1 className="text-2xl font-mono text-amber mb-6">Benchmark</h1>
-      <div className="grid grid-cols-5 gap-4 mb-6">
-        {metrics.map((m) => (
-          <div key={m.label} className="border border-paper/10 rounded-lg p-4 bg-paper/5">
-            <div className="text-xs font-mono text-paper/50 mb-1">{m.label}</div>
-            <div className={`text-2xl font-mono font-bold ${m.color}`}>
-              {(m.value * 100).toFixed(1)}%
-            </div>
+    <div className="max-w-7xl space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-semibold text-text-primary">Benchmark Dashboard</h1>
+          <p className="text-sm text-text-muted">30-case ground truth evaluation</p>
+        </div>
+        <Button size="sm" onClick={runBenchmark} loading={benchmarkLoading}>
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+          Refresh
+        </Button>
+      </div>
+
+      {benchmarkResult && (
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            <KpiCard label="Total Cases" value={benchmarkResult.total_cases} color="text-text-primary" />
+            <KpiCard label="True Positives" value={benchmarkResult.true_positives} color="text-accent-green" />
+            <KpiCard label="False Positives" value={benchmarkResult.false_positives} color="text-accent-red" />
+            <KpiCard label="False Negatives" value={benchmarkResult.false_negatives} color="text-accent-amber" />
+            <KpiCard label="Precision" value={`${(benchmarkResult.precision * 100).toFixed(1)}%`} color="text-accent-purple" />
           </div>
-        ))}
-      </div>
 
-      <div className="grid grid-cols-3 gap-4 mb-6">
-        <div className="p-4 border border-teal/20 rounded-lg bg-teal/5">
-          <div className="text-xs font-mono text-paper/50 mb-1">True Positives</div>
-          <div className="text-xl font-mono text-teal">{data.correct_deviations}</div>
-        </div>
-        <div className="p-4 border border-red-400/20 rounded-lg bg-red-400/5">
-          <div className="text-xs font-mono text-paper/50 mb-1">False Positives</div>
-          <div className="text-xl font-mono text-red-400">{data.false_positives}</div>
-        </div>
-        <div className="p-4 border border-amber/20 rounded-lg bg-amber/5">
-          <div className="text-xs font-mono text-paper/50 mb-1">False Negatives</div>
-          <div className="text-xl font-mono text-amber">{data.false_negatives}</div>
-        </div>
-      </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <KpiCard label="Recall" value={`${(benchmarkResult.recall * 100).toFixed(1)}%`} color="text-accent-cyan" />
+            <KpiCard label="F1 Score" value={`${(benchmarkResult.f1 * 100).toFixed(1)}%`} color="text-accent-blue" />
+          </div>
 
-      <div className="text-xs font-mono text-paper/40">
-        Total test cases: {data.total_cases} &middot; Unsupported verified: {data.unsupported_verified}
-      </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Case Breakdown</CardTitle>
+            </CardHeader>
+            <DataTable
+              columns={columns}
+              data={benchmarkResult.results}
+              emptyMessage="No benchmark results"
+            />
+          </Card>
+        </>
+      )}
     </div>
   )
 }

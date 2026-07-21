@@ -1,78 +1,107 @@
-import { useQuery } from '@tanstack/react-query'
-import { api } from '../../api/client'
+import { useEffect } from 'react'
+import { useParams, Link } from 'react-router-dom'
+import { useStore } from '../../state/store'
+import { Card } from '../../components/ui/Card'
+import { Badge } from '../../components/ui/Badge'
+import { Skeleton } from '../../components/ui/Skeleton'
 
-interface Props {
-  deviationId: string
+const stageOrder = ['requirement', 'equipment', 'purchase_order', 'milestone', 'activity', 'test']
+const stageLabels: Record<string, string> = {
+  requirement: 'Requirements',
+  equipment: 'Equipment',
+  purchase_order: 'Procurement',
+  milestone: 'Milestones',
+  activity: 'Activities',
+  test: 'Tests',
 }
 
 const typeColors: Record<string, string> = {
-  requirement: 'border-amber text-amber',
-  submittal: 'border-blue-400 text-blue-400',
-  equipment: 'border-teal text-teal',
-  purchase_order: 'border-purple-400 text-purple-400',
-  milestone: 'border-paper/50 text-paper/50',
-  activity: 'border-paper/70 text-paper/70',
-  test: 'border-red-400 text-red-400',
+  requirement: 'border-accent-blue bg-accent-blue/10',
+  equipment: 'border-accent-purple bg-accent-purple/10',
+  purchase_order: 'border-accent-cyan bg-accent-cyan/10',
+  milestone: 'border-accent-amber bg-accent-amber/10',
+  activity: 'border-accent-orange bg-accent-orange/10',
+  test: 'border-accent-red bg-accent-red/10',
 }
 
-const statusIcons: Record<string, string> = {
-  violated: '✗',
-  reviewed: '●',
-  affected: '!',
-  delayed: '◷',
-  at_risk: '⚠',
-}
+export function ImpactGraph() {
+  const { deviationId } = useParams<{ deviationId: string }>()
+  const { graphData, setSelectedDeviation } = useStore()
+  useEffect(() => {
+    if (deviationId) setSelectedDeviation(deviationId)
+    return () => { setSelectedDeviation(null) }
+  }, [deviationId])
 
-export function ImpactGraph({ deviationId }: Props) {
-  const { data, isLoading } = useQuery({
-    queryKey: ['impact-graph', deviationId],
-    queryFn: () => api.getImpactGraph(deviationId),
-  })
+  if (!graphData) return <Skeleton className="h-[600px] rounded-lg" />
 
-  if (isLoading) return <div className="font-mono text-paper/50">Loading graph...</div>
-  if (!data) return <div className="font-mono text-paper/50">No graph data</div>
-
-  const stages = [
-    { label: 'Requirement', nodes: data.nodes.filter((n: any) => n.type === 'requirement' || n.type === 'submittal') },
-    { label: 'Equipment', nodes: data.nodes.filter((n: any) => n.type === 'equipment') },
-    { label: 'Procurement', nodes: data.nodes.filter((n: any) => n.type === 'purchase_order') },
-    { label: 'Milestone', nodes: data.nodes.filter((n: any) => n.type === 'milestone') },
-    { label: 'Activity', nodes: data.nodes.filter((n: any) => n.type === 'activity') },
-    { label: 'Test', nodes: data.nodes.filter((n: any) => n.type === 'test') },
-  ].filter((s) => s.nodes.length > 0)
+  const stages = stageOrder.map((type) => ({
+    type,
+    label: stageLabels[type],
+    nodes: graphData.nodes.filter((n) => n.type === type),
+  }))
 
   return (
-    <div className="border border-paper/10 rounded-lg p-6 bg-paper/5">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="font-mono text-sm text-paper/70">Requirement → Commissioning</h2>
-        {data.summary && (
-          <div className="text-xs font-mono text-paper/40">
-            {data.summary.equipment_count} equipment &middot; {data.summary.purchase_order_count} PO &middot;{' '}
-            {data.summary.affected_activity_count} activities &middot; {data.summary.affected_test_count} tests
+    <div className="max-w-7xl space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Link to={`/deviations/${deviationId}`} className="text-text-muted hover:text-text-primary transition-colors">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+          </Link>
+          <div>
+            <h1 className="text-xl font-semibold text-text-primary">Impact Graph</h1>
+            <p className="text-sm text-text-muted font-mono">{graphData.deviation_id}</p>
+          </div>
+        </div>
+      </div>
+
+      <Card>
+        <div className="flex flex-wrap gap-2 mb-6">
+          {Object.entries(stageLabels).map(([type, label]) => (
+            <Badge key={type} variant="default">
+              <span className={`w-2 h-2 rounded-full mr-1.5 ${typeColors[type]?.split(' ')[0]?.replace('border-', 'bg-') || 'bg-gray-500'}`} />
+              {label}
+            </Badge>
+          ))}
+        </div>
+
+        <div className="overflow-x-auto pb-4">
+          <div className="flex gap-8 min-w-[900px]">
+            {stages.map((stage) => (
+              <div key={stage.type} className="flex-1 min-w-[120px]">
+                <div className="text-[10px] font-semibold text-text-muted uppercase tracking-widest mb-3 text-center">
+                  {stage.label}
+                  <span className="ml-1 text-text-muted/50">({stage.nodes.length})</span>
+                </div>
+                <div className="space-y-2">
+                  {stage.nodes.map((node) => (
+                    <div
+                      key={node.id}
+                      className={`p-3 rounded-lg border text-center transition-all
+                        ${typeColors[node.type] || 'border-gray-700 bg-tertiary'}
+                        ${node.status === 'affected' ? 'shadow-glow-red' : ''}`}
+                    >
+                      <div className="text-[10px] font-mono text-text-muted truncate">{node.id}</div>
+                      <div className="text-xs font-medium text-text-primary mt-0.5 truncate">{node.label}</div>
+                      {node.status === 'affected' && (
+                        <Badge variant="critical" className="mt-1.5">AFFECTED</Badge>
+                      )}
+                    </div>
+                  ))}
+                  {stage.nodes.length === 0 && (
+                    <div className="text-center py-6 text-[10px] text-text-muted/40">No nodes</div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {graphData.summary && (
+          <div className="mt-4 p-3 rounded-lg bg-primary/50 text-sm text-text-secondary">
+            {graphData.summary}
           </div>
         )}
-      </div>
-      <div className="flex gap-4 overflow-x-auto pb-4">
-        {stages.map((stage) => (
-          <div key={stage.label} className="flex-shrink-0 w-48">
-            <div className="text-xs font-mono text-paper/30 uppercase mb-2 text-center">{stage.label}</div>
-            <div className="space-y-2">
-              {stage.nodes.map((node: any) => (
-                <div
-                  key={node.id}
-                  className={`p-3 rounded border bg-ink/50 text-xs font-mono ${typeColors[node.type] || 'border-paper/20 text-paper/60'}`}
-                >
-                  <div className="flex items-center gap-1 mb-1">
-                    <span className="text-paper/40">{statusIcons[node.status] || '•'}</span>
-                    <span className="truncate">{node.label}</span>
-                  </div>
-                  <div className="text-[10px] text-paper/30 truncate">{node.id}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
+      </Card>
     </div>
   )
 }

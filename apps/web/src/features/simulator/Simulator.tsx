@@ -1,86 +1,137 @@
-import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { api } from '../../api/client'
+import { useState, useEffect } from 'react'
+import { useParams, Link } from 'react-router-dom'
+import { useStore } from '../../state/store'
+import { Card, CardHeader, CardTitle } from '../../components/ui/Card'
+import { Button } from '../../components/ui/Button'
+import { Skeleton } from '../../components/ui/Skeleton'
+import { Badge } from '../../components/ui/Badge'
 
-interface Props {
-  deviationId: string
-  deviation?: any
-}
+const presets = [7, 14, 30, 60]
 
-export function Simulator({ deviationId }: Props) {
-  const [delayDays, setDelayDays] = useState(0)
-  const [trigger, setTrigger] = useState(0)
+export function Simulator() {
+  const { deviationId } = useParams<{ deviationId: string }>()
+  const { selectedDeviation, simulationResult, simulationLoading, setSelectedDeviation, runSimulation } = useStore()
+  const [extraDays, setExtraDays] = useState(30)
 
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['simulate', deviationId, delayDays, trigger],
-    queryFn: () => api.simulate(deviationId, delayDays),
-    enabled: trigger > 0,
-  })
+  useEffect(() => {
+    if (deviationId) setSelectedDeviation(deviationId)
+    return () => { setSelectedDeviation(null) }
+  }, [deviationId])
+
+  const handleRun = () => {
+    if (deviationId) runSimulation(deviationId, extraDays)
+  }
+
+  if (!selectedDeviation) return <Skeleton className="h-96 rounded-lg" />
 
   return (
-    <div className="border border-paper/10 rounded-lg p-6 bg-paper/5">
-      <h2 className="font-mono text-sm text-paper/70 mb-4">Schedule Impact Simulator</h2>
-      <div className="space-y-4">
-        <div>
-          <label className="text-xs font-mono text-paper/50 block mb-2">
-            Extra delay on affected activities: <span className="text-amber font-bold">{delayDays} days</span>
-          </label>
-          <input
-            type="range"
-            min={0}
-            max={60}
-            value={delayDays}
-            onChange={(e) => setDelayDays(Number(e.target.value))}
-            className="w-full accent-amber"
-          />
-          <div className="flex justify-between text-[10px] font-mono text-paper/30">
-            <span>0 days</span>
-            <span>60 days</span>
+    <div className="max-w-7xl space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Link to={`/deviations/${deviationId}`} className="text-text-muted hover:text-text-primary transition-colors">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+          </Link>
+          <div>
+            <h1 className="text-xl font-semibold text-text-primary">Scenario Simulator</h1>
+            <p className="text-sm text-text-muted font-mono">{deviationId}</p>
           </div>
         </div>
-        <button
-          onClick={() => setTrigger((t) => t + 1)}
-          className="px-4 py-2 bg-amber/20 border border-amber/40 text-amber font-mono text-sm rounded hover:bg-amber/30 transition-colors"
-        >
-          Simulate
-        </button>
       </div>
 
-      {isLoading && <div className="mt-4 font-mono text-xs text-paper/50">Computing...</div>}
-      {error && <div className="mt-4 font-mono text-xs text-red-400">Simulation failed</div>}
-      {data && trigger > 0 && (
-        <div className="mt-4 grid grid-cols-3 gap-4">
-          <div className="p-3 border border-paper/10 rounded bg-ink/50">
-            <div className="text-xs font-mono text-paper/50">Baseline</div>
-            <div className="text-xl font-mono text-teal">{data.baseline_duration_days} <span className="text-xs text-paper/40">days</span></div>
-          </div>
-          <div className="p-3 border border-paper/10 rounded bg-ink/50">
-            <div className="text-xs font-mono text-paper/50">Impacted</div>
-            <div className="text-xl font-mono text-red-400">{data.impacted_duration_days} <span className="text-xs text-paper/40">days</span></div>
-          </div>
-          <div className="p-3 border border-paper/10 rounded bg-ink/50">
-            <div className="text-xs font-mono text-paper/50">Delta</div>
-            <div className={`text-xl font-mono ${data.project_delta_days > 0 ? 'text-red-400' : 'text-teal'}`}>
-              {data.project_delta_days > 0 ? '+' : ''}{data.project_delta_days} <span className="text-xs text-paper/40">days</span>
+      <Card>
+        <CardHeader>
+          <CardTitle>Parameters</CardTitle>
+        </CardHeader>
+        <div className="space-y-6">
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm text-text-secondary">Extra Delay</span>
+              <span className="text-lg font-mono font-bold text-accent-blue">{extraDays} days</span>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="60"
+              step="1"
+              value={extraDays}
+              onChange={(e) => setExtraDays(Number(e.target.value))}
+              className="w-full h-2 rounded-full appearance-none bg-tertiary cursor-pointer
+                [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5
+                [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-accent-blue
+                [&::-webkit-slider-thumb]:shadow-glow-blue [&::-webkit-slider-thumb]:cursor-pointer"
+            />
+            <div className="flex justify-between mt-1 text-[10px] text-text-muted">
+              <span>0</span><span>15</span><span>30</span><span>45</span><span>60</span>
             </div>
           </div>
+
+          <div className="flex gap-2">
+            {presets.map((p) => (
+              <Button
+                key={p}
+                variant={extraDays === p ? 'primary' : 'secondary'}
+                size="sm"
+                onClick={() => setExtraDays(p)}
+              >+{p}d</Button>
+            ))}
+          </div>
+
+          <Button onClick={handleRun} loading={simulationLoading} className="w-full">
+            Run Simulation
+          </Button>
+        </div>
+      </Card>
+
+      {simulationResult && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Baseline</CardTitle>
+              <Badge variant="compliant">SCHEDULED</Badge>
+            </CardHeader>
+            <div className="space-y-2">
+              {Object.entries(simulationResult.baseline).map(([key, val]) => (
+                <div key={key} className="flex justify-between text-sm py-1">
+                  <span className="text-text-muted">{key}</span>
+                  <span className="font-mono text-text-primary">{val}</span>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Impacted</CardTitle>
+              <Badge variant="critical">+{simulationResult.total_delay_days}d DELAY</Badge>
+            </CardHeader>
+            <div className="space-y-2">
+              {Object.entries(simulationResult.impacted).map(([key, val]) => (
+                <div key={key} className="flex justify-between text-sm py-1">
+                  <span className="text-text-muted">{key}</span>
+                  <span className="font-mono text-accent-red">{val}</span>
+                </div>
+              ))}
+            </div>
+          </Card>
         </div>
       )}
 
-      {data && trigger > 0 && data.float_by_activity && (
-        <div className="mt-4">
-          <div className="text-xs font-mono text-paper/50 mb-2">Activity Float</div>
-          <div className="grid grid-cols-4 gap-2">
-            {Object.entries(data.float_by_activity as Record<string, number>)
-              .sort(([, a], [, b]) => a - b)
-              .slice(0, 8)
-              .map(([id, float]) => (
-                <div key={id} className={`p-2 rounded text-xs font-mono border ${float === 0 ? 'border-red-400/30 text-red-400' : 'border-paper/10 text-paper/50'}`}>
-                  {id}: {float}d
-                </div>
-              ))}
+      {simulationResult && simulationResult.critical_path?.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Critical Path</CardTitle>
+          </CardHeader>
+          <div className="flex flex-wrap gap-2">
+            {simulationResult.critical_path.map((a, i) => (
+              <span key={a} className="flex items-center gap-1 text-xs font-mono">
+                <Badge variant="warning">{a}</Badge>
+                {i < simulationResult.critical_path.length - 1 && (
+                  <svg className="w-4 h-4 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                )}
+              </span>
+            ))}
           </div>
-        </div>
+        </Card>
       )}
     </div>
   )

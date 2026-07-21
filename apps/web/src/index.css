@@ -2,8 +2,61 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  margin: 0;
-  font-family: 'Space Grotesk', sans-serif;
-  -webkit-font-smoothing: antialiased;
+@layer base {
+  :root {
+    --bg-primary: #0a0e17;
+    --bg-secondary: #111827;
+    --bg-tertiary: #1e293b;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --accent-blue: #3b82f6;
+    --accent-cyan: #06b6d4;
+    --accent-amber: #f59e0b;
+    --accent-orange: #ea580c;
+    --accent-red: #ef4444;
+    --accent-green: #22c55e;
+    --accent-purple: #a855f7;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #1e293b transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: #1e293b;
+    border-radius: 3px;
+  }
+
+  body {
+    margin: 0;
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+  }
+}
+
+@layer components {
+  .skeleton {
+    @apply bg-tertiary rounded animate-pulse;
+  }
+
+  .card-hover {
+    @apply transition-all duration-150;
+  }
+  .card-hover:hover {
+    @apply border-accent-blue/30 shadow-glow-blue;
+  }
 }

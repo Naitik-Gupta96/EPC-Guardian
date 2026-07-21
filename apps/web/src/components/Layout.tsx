@@ -1,40 +1,28 @@
-import { Link, Outlet, useLocation } from 'react-router-dom'
-
-const navItems = [
-  { to: '/deviations', label: 'Compliance Feed' },
-  { to: '/benchmark', label: 'Benchmark' },
-  { to: '/documents', label: 'Documents' },
-  { to: '/audit', label: 'Audit' },
-]
+import { useEffect } from 'react'
+import { Outlet } from 'react-router-dom'
+import { Header } from './Header'
+import { Sidebar } from './Sidebar'
+import { ToastContainer } from './ui/Toast'
+import { useStore } from '../state/store'
 
 export function Layout() {
-  const location = useLocation()
+  const { setProjectId, fetchDeviations } = useStore()
+
+  useEffect(() => {
+    setProjectId('DC-TIER3-DEMO-001')
+    fetchDeviations()
+  }, [])
+
   return (
-    <div className="min-h-screen bg-ink text-paper font-sans">
-      <header className="border-b border-paper/10 px-6 py-3 flex items-center justify-between">
-        <Link to="/" className="text-amber font-mono font-bold text-lg tracking-tight">
-          EPC GUARDIAN
-        </Link>
-        <nav className="flex gap-6 text-sm">
-          {navItems.map((item) => (
-            <Link
-              key={item.to}
-              to={item.to}
-              className={`transition-colors ${
-                location.pathname.startsWith(item.to)
-                  ? 'text-amber'
-                  : 'text-paper/60 hover:text-paper'
-              }`}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-        <span className="text-xs font-mono text-paper/30">seeded mode</span>
-      </header>
-      <main className="p-6">
-        <Outlet />
-      </main>
+    <div className="h-screen flex flex-col bg-primary text-text-primary">
+      <Header />
+      <div className="flex flex-1 overflow-hidden">
+        <Sidebar />
+        <main className="flex-1 overflow-y-auto p-6">
+          <Outlet />
+        </main>
+      </div>
+      <ToastContainer />
     </div>
   )
 }
